@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Storywright 故事匠 · 剧本工作台</title>
+<meta name="description" content="Storywright：开源本地剧本工作台。把小说改编成可直接开拍的剧本。数据只保存在这台电脑上，不外流。自带 Key，无需注册，免费导出资产包。">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: #08090C; color: #F2F4F8;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+    overflow-x: hidden;
+  }
+  /* 工作台 iframe：默认隐藏，点「进入工作台」后原地显示，避免跨文档跳转被预览环境拦截 */
+  #appFrame {
+    position: fixed; inset: 0; z-index: 60; border: 0; display: none; width: 100%; height: 100%;
+    background: #060A14;
+  }
+  .splash { min-height: 100vh; display: flex; flex-direction: column; }
+
+  .bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+  .bg .glow {
+    position: absolute; left: 50%; top: 34%; transform: translate(-50%,-50%);
+    width: 900px; height: 620px; border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(245,166,35,0.10), rgba(245,166,35,0.03) 55%, transparent 75%);
+  }
+  .bg .dots {
+    position: absolute; inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,0.10) 1px, transparent 1.4px);
+    background-size: 22px 22px;
+    -webkit-mask-image: radial-gradient(ellipse 72% 60% at 50% 42%, transparent 40%, #000 100%);
+            mask-image: radial-gradient(ellipse 72% 60% at 50% 42%, transparent 40%, #000 100%);
+  }
+  .bg .vig { position: absolute; inset: 0; background: radial-gradient(ellipse 120% 90% at 50% 20%, transparent 55%, rgba(0,0,0,0.55) 100%); }
+
+  .topbar {
+    position: relative; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 36px;
+  }
+  .brand { display: flex; align-items: center; gap: 11px; font-size: 18px; font-weight: 700; letter-spacing: 0.5px; }
+  .brand .mark {
+    width: 34px; height: 34px; border-radius: 9px;
+    background: linear-gradient(135deg, #FFC24D, #F5A623);
+    color: #14100A; display: flex; align-items: center; justify-content: center;
+    font-size: 19px; font-weight: 800;
+    box-shadow: 0 0 22px rgba(245,166,35,0.35);
+  }
+  .nav { display: flex; align-items: center; gap: 26px; font-size: 14px; color: #9aa5b5; }
+  .nav a { cursor: pointer; transition: color .15s; }
+  .nav a:hover { color: #F2F4F8; }
+  .nav .dl {
+    background: #F2F4F8; color: #0B0C0F; font-weight: 600;
+    border-radius: 999px; padding: 9px 20px; cursor: pointer; border: none; font-size: 14px;
+  }
+  .nav .lang {
+    background: transparent; color: #9aa5b5; font-weight: 600;
+    border: 1px solid rgba(255,255,255,.18); border-radius: 999px;
+    padding: 7px 15px; cursor: pointer; font-size: 13px; transition: color .15s, border-color .15s;
+  }
+  .nav .lang:hover { color: #F2F4F8; border-color: rgba(255,255,255,.4); }
+  .nav .dl:hover { background: #fff; }
+
+  main { position: relative; z-index: 5; flex: 1; text-align: center; padding: 30px 24px 40px; }
+
+  .badge-wrap { display: flex; align-items: center; justify-content: center; gap: 18px; margin-bottom: 34px; }
+  .laurel { width: 92px; height: 56px; opacity: .85; }
+  .pill {
+    border: 1px solid rgba(245,166,35,0.55);
+    background: linear-gradient(180deg, rgba(245,166,35,0.10), rgba(245,166,35,0.03));
+    border-radius: 14px; padding: 10px 26px;
+    box-shadow: 0 0 30px rgba(245,166,35,0.12), inset 0 0 18px rgba(245,166,35,0.05);
+  }
+  .pill .l1 { font-size: 10px; letter-spacing: 3px; color: #d9a13c; margin-bottom: 3px; }
+  .pill .l2 { font-size: 15px; font-weight: 600; color: #F5D9A8; letter-spacing: 1px; }
+
+  h1 {
+    font-size: 64px; font-weight: 800; letter-spacing: 4px; line-height: 1.15;
+    background: linear-gradient(180deg, #FFFFFF 55%, #B9C2D0);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    text-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  }
+  .sub { font-size: 17px; color: #9aa5b5; line-height: 2; margin: 26px auto 0; max-width: 620px; }
+  .sub b { color: #F2F4F8; font-weight: 700; }
+  .sub .em { color: #F5A623; font-weight: 700; }
+
+  .chips { display: inline-flex; align-items: center; gap: 8px; margin-top: 34px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09); border-radius: 12px; padding: 8px 12px; }
+  .chips span { font-size: 13px; color: #c3cbd8; padding: 4px 10px; border-radius: 8px; white-space: nowrap; }
+  .chips span.on { background: rgba(255,255,255,0.10); color: #fff; }
+  .chips i { width: 1px; height: 14px; background: rgba(255,255,255,0.14); }
+
+  .cta-row { margin-top: 26px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .cta {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: linear-gradient(180deg, #FFC24D, #F5A623); color: #14100A;
+    border: none; border-radius: 999px; padding: 14px 38px;
+    font-size: 16px; font-weight: 700; letter-spacing: 1px; cursor: pointer;
+    box-shadow: 0 6px 30px rgba(245,166,35,0.35), inset 0 1px 0 rgba(255,255,255,0.4);
+    transition: transform .12s, box-shadow .12s;
+  }
+  .cta:hover { transform: translateY(-1px); box-shadow: 0 10px 36px rgba(245,166,35,0.45), inset 0 1px 0 rgba(255,255,255,0.4); }
+  .cta-note { font-size: 12px; color: #6b7688; letter-spacing: 1px; }
+
+  .install {
+    max-width: 640px; margin: 40px auto 0;
+    display: flex; align-items: stretch; gap: 0;
+    background: rgba(10,12,16,0.85); border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px; overflow: hidden;
+    box-shadow: 0 14px 44px rgba(0,0,0,0.45);
+  }
+  .install .cmd {
+    flex: 1; text-align: left; padding: 14px 18px;
+    font-family: "SF Mono", Consolas, monospace; font-size: 13px; color: #d7dee9;
+    display: flex; flex-direction: column; justify-content: center; gap: 4px; overflow-x: auto; white-space: nowrap;
+  }
+  .install .cmd .ps { color: #F5A623; }
+  .install .cmd .cm { color: #5d6878; }
+  .install .copy {
+    background: rgba(255,255,255,0.08); border: none; border-left: 1px solid rgba(255,255,255,0.10);
+    color: #e8edf6; font-size: 13px; padding: 0 22px; cursor: pointer; flex: 0 0 auto;
+  }
+  .install .copy:hover { background: rgba(255,255,255,0.14); }
+  .install-note { font-size: 12px; color: #5d6878; margin-top: 12px; letter-spacing: 1px; }
+
+  .feats { display: flex; justify-content: center; gap: 14px; margin-top: 52px; flex-wrap: wrap; }
+  .feat {
+    background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px; padding: 18px 26px; font-size: 14px; color: #c3cbd8;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .feat b { color: #F2F4F8; }
+  .feat .dot { width: 7px; height: 7px; border-radius: 50%; background: #F5A623; box-shadow: 0 0 10px rgba(245,166,35,0.8); flex: 0 0 auto; }
+
+  footer { position: relative; z-index: 5; text-align: center; font-size: 12px; color: #4d586a; padding: 26px 24px 34px; letter-spacing: 1px; }
+  footer b { color: #7c8798; font-weight: 600; }
+
+  @media (max-width: 720px) {
+    h1 { font-size: 38px; letter-spacing: 2px; }
+    .nav { display: none; }
+    .laurel { width: 60px; height: 38px; }
+    .install { flex-direction: column; }
+    .install .copy { border-left: none; border-top: 1px solid rgba(255,255,255,0.10); padding: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<iframe id="appFrame" src="/workbench.html"></iframe>
+
+<div class="splash" id="splash">
+  <div class="bg"><div class="glow"></div><div class="dots"></div><div class="vig"></div></div>
+
+  <div class="topbar">
+    <div class="brand"><div class="mark">S</div>Storywright</div>
+    <div class="nav">
+      <a onclick="enterWorkbench()">工作台</a>
+      <a onclick="document.getElementById('instCmd').scrollIntoView({behavior:'smooth'})">本地运行</a>
+      <a title="MIT License">开源协议</a>
+      <button class="lang" id="splashLangBtn" onclick="toggleSplashLang()">中</button>
+      <button class="dl" onclick="enterWorkbench()">进入工作台 →</button>
+    </div>
+  </div>
+
+  <main>
+    <div class="badge-wrap">
+      <svg class="laurel" viewBox="0 0 92 56" fill="none">
+        <g stroke="#C9A24B" stroke-width="1.6" stroke-linecap="round">
+          <path d="M14 50 C6 40 4 26 10 14"/>
+          <path d="M12 44 C7 42 5 38 6 33"/><path d="M10 36 C5 34 4 30 5 25"/>
+          <path d="M9 28 C5 26 4 22 6 17"/><path d="M10 20 C7 17 8 13 11 10"/>
+          <circle cx="17" cy="49" r="1.6" fill="#C9A24B"/><circle cx="14" cy="41" r="1.6" fill="#C9A24B"/>
+          <circle cx="12" cy="33" r="1.6" fill="#C9A24B"/><circle cx="11" cy="25" r="1.6" fill="#C9A24B"/>
+        </g>
+      </svg>
+      <div class="pill">
+        <div class="l1">OPEN SOURCE · LOCAL FIRST</div>
+        <div class="l2">数据只保存在这台电脑</div>
+      </div>
+      <svg class="laurel" viewBox="0 0 92 56" fill="none" style="transform:scaleX(-1)">
+        <g stroke="#C9A24B" stroke-width="1.6" stroke-linecap="round">
+          <path d="M14 50 C6 40 4 26 10 14"/>
+          <path d="M12 44 C7 42 5 38 6 33"/><path d="M10 36 C5 34 4 30 5 25"/>
+          <path d="M9 28 C5 26 4 22 6 17"/><path d="M10 20 C7 17 8 13 11 10"/>
+          <circle cx="17" cy="49" r="1.6" fill="#C9A24B"/><circle cx="14" cy="41" r="1.6" fill="#C9A24B"/>
+          <circle cx="12" cy="33" r="1.6" fill="#C9A24B"/><circle cx="11" cy="25" r="1.6" fill="#C9A24B"/>
+        </g>
+      </svg>
+    </div>
+
+    <h1>开源本地剧本工作台</h1>
+    <div class="sub">
+      把小说改编成<b>可直接开拍</b>的剧本——故事中枢、分集大纲、改编剧本、分镜脚本，<br>
+      <span class="em">全流程在这台电脑上完成</span>，不注册、不登录、<b>数据零上传</b>。
+    </div>
+
+    <div class="chips">
+      <span class="on">DeepSeek</span><i></i>
+      <span>智谱</span><i></i>
+      <span>通义千问</span><i></i>
+      <span>Kimi</span><i></i>
+      <span>任意 OpenAI 兼容接口</span>
+    </div>
+
+    <div class="cta-row">
+      <button class="cta" onclick="enterWorkbench()">进入工作台 →</button>
+      <div class="cta-note">免费 · 开源 · MIT 协议 · 无需配置即可先逛界面</div>
+    </div>
+
+    <div class="install" id="instCmd">
+      <div class="cmd">
+        <span><span class="ps">$</span> pip install -r requirements.txt</span>
+        <span><span class="ps">$</span> python server_local.py <span class="cm"># 浏览器打开 127.0.0.1:5178</span></span>
+      </div>
+      <button class="copy" onclick="(function(b){b.textContent='已复制';navigator.clipboard.writeText('pip install -r requirements.txt\npython server_local.py');setTimeout(function(){b.textContent='复制';},1500);})(this)">复制</button>
+    </div>
+    <div class="install-note">Windows · macOS · Linux 均可运行（需 Python 3.9+ 与你自己的模型 Key）</div>
+
+    <div class="feats">
+      <div class="feat"><span class="dot"></span><b>零上传</b>&nbsp;项目文件只存本机 data 目录</div>
+      <div class="feat"><span class="dot"></span><b>零埋点</b>&nbsp;我们看不到谁在用、用了什么</div>
+      <div class="feat"><span class="dot"></span><b>免费导出</b>&nbsp;全剧资产包一键带走（.md）</div>
+    </div>
+  </main>
+
+  <footer>© 2026 <b>Storywright Contributors</b> · MIT License · 本页不收集任何访问数据</footer>
+</div>
+
+<script>
+  function enterWorkbench() {
+    try { localStorage.setItem('storywright_seen_splash', '1'); } catch (e) {}
+    var sp = document.getElementById('splash');
+    var fr = document.getElementById('appFrame');
+    if (sp) sp.style.display = 'none';
+    if (fr) fr.style.display = 'block';
+    window.scrollTo(0, 0);
+  }
+  // 已看过首页的访客（本地版）直接进工作台，不再被门面拦住
+  try {
+    if (localStorage.getItem('storywright_seen_splash') === '1') {
+      enterWorkbench();
+    }
+  } catch (e) {}
+
+  // 门面页语言切换：与工作台共用 storywright_lang，i18n.js 引擎负责翻静态文本
+  function syncSplashLangBtn() {
+    var b = document.getElementById('splashLangBtn');
+    if (!b || !window.SW_I18N) return;
+    var zh = SW_I18N.getLang() === 'zh';
+    b.textContent = zh ? 'EN' : '中';
+    b.title = zh ? 'Switch to English' : '切换为中文';
+  }
+  function toggleSplashLang() {
+    if (window.SW_I18N) SW_I18N.toggle();
+    syncSplashLangBtn();
+  }
+  syncSplashLangBtn();
+</script>
+
+<script src="i18n.js?v=20261019-i18n"></script>
+<script>
+  // i18n.js 加载完后同步一次按钮态（脚本在 DOM 就绪后执行，body 已存在）
+  syncSplashLangBtn();
+</script>
+
+</body>
+</html>
