@@ -56,11 +56,44 @@ Three names, one line, each owning a segment:
 
 The local and cloud editions run the same pipeline; the only difference is "build it yourself" versus "someone serves it to you."
 
+## MCP server
+
+`mcp_server.py` speaks MCP over stdio, so any MCP client (Claude Code, Cursor, or your own agent) can drive the workbench. No SDK, no dependencies — just JSON-RPC 2.0.
+
+```bash
+python3 mcp_server.py          # stdio transport
+python3 mcp_server.py --selftest   # local self-check, no client needed
+```
+
+Client config (Claude Desktop / Cursor, adjust the paths):
+
+```json
+{
+  "mcpServers": {
+    "storywright": {
+      "command": "python3",
+      "args": ["/absolute/path/to/storywright/mcp_server.py"]
+    }
+  }
+}
+```
+
+Tools it exposes:
+
+| Tool | What it does |
+| --- | --- |
+| `list_projects` | Every local project with episode/shot/character counts |
+| `get_project` | Read a project — `section`: `summary` / `bible` / `episodes` / `shots` / `script` / `all` |
+| `create_project` | Import a source passage as a new project the workbench can open |
+| `delete_project` | Remove a project (irreversible) |
+| `run_continuity_check` | Run the 15 ShotLock rules over a shot script; `lang=zh\|en`, `format=text\|html` |
+
 ## Project layout
 
 ```
 main.py            Deploy entrypoint (reads $PORT, binds 0.0.0.0); imports server_local.app
 server_local.py    Flask app: serves index.html + workbench.html and the /api/* backend
+mcp_server.py      MCP server over stdio (JSON-RPC 2.0, no SDK required)
 workbench.html     The single-file workbench UI (all six steps + story core)
 index.html         Bilingual landing / splash page
 i18n.js            Translation dictionary and runtime (English / 中文)
@@ -81,5 +114,5 @@ MIT. Use it, modify it, credit or not — your call.
 
 - [x] English README and docs
 - [x] Built-in ShotLock QC step (run the 15 rules automatically after stage 5)
-- [ ] MCP server: let Claude Code / Cursor call the "story core" and "shot script" tools directly
+- [x] MCP server: let Claude Code / Cursor call the "story core" and "shot script" tools directly
 - [ ] Front-end modularization (split the single-file workbench)
