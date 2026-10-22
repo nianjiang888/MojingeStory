@@ -783,6 +783,9 @@
     '来源：我按本集剧本拆的': 'Source: split from this episode\'s script',
     '来源：规则切分（按句）': 'Source: rule split (by sentence)',
     '尚未生成分镜': 'No shots yet',
+    '连续性检查': 'Continuity check',
+    '连续性检查 · ShotLock': 'Continuity check · ShotLock',
+    '检查中…': 'Checking…',
     '来源：AI 改写': 'Source: AI rewrite', '来源：手动': 'Source: manual',
     '来源：原文（待改编）': 'Source: original (awaiting adaptation)',
     /* 剧集卡片 · 戏剧事件 / 原梗概对照 */
@@ -1239,6 +1242,7 @@
      精确字典匹配不到，这里用带捕获组的正则整串匹配，英文模板里 $N 引用捕获组。
      前缀都是 UI 专属措辞（如「补写失败：」「已从原剧找回「」），用户内容不会误触。仅英文态启用。===== */
   var FEEDBACK_RULES = [
+    [ /^连续性检查失败：([\s\S]*)$/, 'Continuity check failed: $1' ],
     [ /^一键巡航，我连着往下跑：创建故事中枢 → 改编蓝图 → 分集 → 逐集改编剧本 → 生成分镜脚本（不出图、不出片）。\n预计消耗约 ¥([\d.,]+)（按 (\d+) 集估算，每日额度护栏照常）。是否开始？$/,
       'One-click cruise — I will run straight through: Create Story Bible → Adaptation Blueprint → Split Episodes → Script per Episode → Generate Shots (no images, no video).\nEstimated cost: about ¥$1 (based on $2 episodes; daily quota guardrails still apply). Start?' ],
     [ /^当前 (\d+) \/ (\d+) 集已生成分镜。$/, 'Currently $1 / $2 episodes have shots generated.' ],
