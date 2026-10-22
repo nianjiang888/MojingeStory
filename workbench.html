@@ -2609,148 +2609,6 @@
     downloadTextFile(assetPackText(p), (p.name || (en ? 'Storywright script' : 'Storywright 剧本')).replace(/[\\/:*?"<>|]/g, '_') + (en ? '_asset-pack.md' : '_资产包.md'));
   }
 
-  // ===== 第六批：交付中心（预览免费 · 分类打包下载付费墙） =====
-  // 价格与后端 server/wbdl_routes.py 的 WBDL_CATS 镜像（服务端为准）；改价两处同步。
-  var WBDL_CATS = [
-    { id: 'chars',   title: '人物 DNA 档案包', price: 3,  cnt: '个人物', desc: '全部角色的 16 字段 DNA 档案 + 生图提示词，直接贴进即梦 / 可灵出图锁脸。' },
-    { id: 'scenes',  title: '场景资产包',       price: 3,  cnt: '个场景', desc: '全部场景的三段式描写（全景 / 中景 / 特写）+ 堪景单，出图不穿帮。' },
-    { id: 'scripts', title: '全剧剧本包',       price: 3,  cnt: '集剧本', desc: '全部分集剧本全文逐集分好，直接开拍或交配音。' },
-    { id: 'shots',   title: '分镜提示词包',     price: 5,  cnt: '镜提示词', desc: '逐镜文生图词 + 图生视频词（含起幅 / 站位 / 视线三锁与时间轴），按镜分好直接用。' },
-    { id: 'deliver', title: '交付三件套',       price: 5,  cnt: '镜派生', desc: '全剧配音稿 + 字幕表 + 音效谱（按集分好、带时间轴），配音 / 字幕 / 混音照表开工。' },
-    { id: 'style',   title: '全局风格卡',       price: 1,  cnt: '/8 字段', desc: '全剧统一画风契约（画风 / 色调 / 光线 / 画面禁忌等 8 字段），多平台出图不漂移。' },
-    { id: 'all',     title: '全家桶',           price: 12, cnt: '一份全带走', desc: '以上六包全部 + 故事总纲 / 改编蓝图，一份文件全带走（单买合计 20 元，桶价 12 元）。' }
-  ];
-
-  function catCounts(p) {
-    var eps = p.episodes || [];
-    var shotTotal = 0;
-    eps.forEach(function (e) { shotTotal += ((p.shots && p.shots[e.id]) || []).length; });
-    var scFilled = 0, sc = p.styleCard;
-    if (sc) STYLECARD_FIELDS.forEach(function (f) { if (sc[f.k] && String(sc[f.k]).trim()) scFilled++; });
-    var chars = ((p.bible && p.bible.characters) || []).filter(function (c) { return c && (c._added || isValidCharacterName(c.name)); });
-    var scenes = ((p.bible && p.bible.scenes) || []).filter(function (s) { return s && (s._added || MG.isValidSceneName(s.name)); });
-    return {
-      chars: chars.length, scenes: scenes.length,
-      scripts: eps.filter(function (e) { return (e.text || '').trim(); }).length,
-      shots: shotTotal, deliver: shotTotal, style: scFilled
-    };
-  }
-
-  function buildCatText(p, catId) {
-    if (catId === 'all') return assetPackText(p);
-    if (catId === 'chars') return ['# ' + (p.name || 'Storywright 剧本') + ' · 人物 DNA 档案包', ''].concat(catLinesChars(p)).join('\n');
-    if (catId === 'scenes') return ['# ' + (p.name || 'Storywright 剧本') + ' · 场景资产包', ''].concat(catLinesScenes(p)).join('\n');
-    if (catId === 'scripts') return ['# ' + (p.name || 'Storywright 剧本') + ' · 全剧剧本包', ''].concat(catLinesScripts(p)).join('\n');
-    if (catId === 'shots') return ['# ' + (p.name || 'Storywright 剧本') + ' · 分镜提示词包', ''].concat(catLinesShots(p)).join('\n');
-    if (catId === 'deliver') return ['# ' + (p.name || 'Storywright 剧本') + ' · 交付三件套', ''].concat(catLinesDeliver(p)).join('\n');
-    if (catId === 'style') return ['# ' + (p.name || 'Storywright 剧本') + ' · 全局风格卡', ''].concat(catLinesStyle(p)).join('\n');
-    return '';
-  }
-
-  function dlvCatById(id) { return WBDL_CATS.filter(function (c) { return c.id === id; })[0] || null; }
-
-  function dlvCardsHtml(p, st) {
-    var cnt = catCounts(p);
-    return WBDL_CATS.map(function (c) {
-      var n = cnt[c.id] || 0;
-      var empty = (c.id !== 'style' && c.id !== 'all' && n <= 0);
-      var owned = !!st.purchased[c.id] || c.price <= 0;
-      var meta = (c.id === 'style') ? (n + ' / 8 字段已填') : (c.id === 'all')
-        ? (catCounts(p).chars + ' 人物 · ' + cnt.scenes + ' 场景 · ' + cnt.scripts + ' 集剧本 · ' + cnt.shots + ' 镜')
-        : (n + ' ' + c.cnt);
-      return '<div class="dlv-card' + (empty ? ' dlv-empty' : '') + '">' +
-        '<div class="dlv-card-main">' +
-          '<b>' + esc(c.title) + '</b>' +
-          '<span class="dlv-desc">' + esc(c.desc) + '</span>' +
-          '<span class="dlv-meta">' + esc(meta) + (empty ? ' · 暂无内容，先去生成对应板块' : '') + '</span>' +
-        '</div>' +
-        '<div class="dlv-card-act">' +
-          (st.purchased[c.id] ? '<span class="dlv-owned">已购</span>'
-            : (c.price > 0 ? '<span class="dlv-price">¥' + c.price + '</span>' : '<span class="dlv-owned">免费</span>')) +
-          '<button class="ghost-btn" data-dlv-preview="' + c.id + '"' + (empty ? ' disabled' : '') + '>预览</button>' +
-          '<button class="primary-btn" data-dlv-get="' + c.id + '"' + (empty ? ' disabled' : '') + '>' + (owned ? '下载 .md' : '购买并下载') + '</button>' +
-        '</div>' +
-      '</div>';
-    }).join('');
-  }
-
-  function renderDeliveryCenter(p) {
-    return '<div class="dlv-center">' +
-      '<div class="md-detail-hint">内容在本页所有板块随时免费查看；这里出售的是整理好的<b>分类打包文件</b>（.md，直接交给出图 / 出视频 / 配音 / 剪辑）。已购分类可反复下载。</div>' +
-      '<div id="dlvCards"></div>' +
-      '<pre class="dlv-pre" id="dlvPreview" style="display:none;"></pre>' +
-      '</div>';
-  }
-
-  function dlvBalanceHtml(st) {
-    return '';
-  }
-
-  function wireDelivery(p) {
-    var st = { purchased: {}, balance: null };
-    function draw() {
-      var cards = document.getElementById('dlvCards');
-      if (cards) cards.innerHTML = dlvCardsHtml(p, st);
-      var hint = document.querySelector('.dlv-center .md-detail-hint');
-      if (hint && st.balance != null && !hint.getAttribute('data-bal')) {
-        hint.setAttribute('data-bal', '1');
-        hint.innerHTML += dlvBalanceHtml(st);
-      }
-      Array.prototype.forEach.call(document.querySelectorAll('[data-dlv-preview]'), function (el) {
-        el.onclick = function () {
-          var cat = el.getAttribute('data-dlv-preview');
-          var pre = document.getElementById('dlvPreview');
-          if (!pre) return;
-          if (pre.style.display !== 'none' && pre.getAttribute('data-cat') === cat) { pre.style.display = 'none'; return; }
-          var txt = buildCatText(p, cat);
-          pre.setAttribute('data-cat', cat);
-          pre.textContent = txt || '（该分类暂无内容：先去生成对应板块，再回来下载。）';
-          pre.style.display = 'block';
-          if (pre.scrollIntoView) try { pre.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (e) {}
-        };
-      });
-      Array.prototype.forEach.call(document.querySelectorAll('[data-dlv-get]'), function (el) {
-        el.onclick = function () { dlvGet(p, el.getAttribute('data-dlv-get'), st, draw, el); };
-      });
-    }
-    MG.api('/api/wbdl/state').then(function (r) {
-      if (r && r.ok) { st.purchased = r.purchased || {}; st.balance = r.balance; }
-      draw();
-    }).catch(function () { draw(); });
-    draw();
-  }
-
-  function dlvGet(p, catId, st, redraw, btn) {
-    var c = dlvCatById(catId);
-    if (!c) return;
-    var go = function () {
-      downloadTextFile(buildCatText(p, catId), (p.name || 'Storywright 剧本').replace(/[\\/:*?"<>|]/g, '_') + '_' + c.title + '.md');
-    };
-    if (c.price <= 0 || st.purchased[catId]) { go(); return; }
-    var msg = '下载「' + c.title + '」需 ¥' + c.price + '，从余额扣除' + (st.balance != null ? '（当前余额 ¥' + st.balance + '）' : '') + '。购买后可反复下载。确认购买？';
-    MG.confirm(msg, { title: '购买确认' }).then(function (yes) {
-      if (!yes) return;
-      if (btn) { btn.disabled = true; btn.textContent = '购买中…'; }
-      MG.api('/api/wbdl/buy', 'POST', { cat: catId, pid: p.name || '' }).then(function (r) {
-        if (r && r.ok) {
-          st.purchased[catId] = r.purchased !== false;
-          if (typeof r.balance === 'number') st.balance = r.balance;
-          redraw();
-          go();
-          MG.toast('已购买「' + c.title + '」，文件开始下载。');
-        } else if (r && r.needRecharge) {
-          if (btn) { btn.disabled = false; btn.textContent = '购买并下载'; }
-          MG.alert('余额不足：需 ¥' + r.price + '，当前余额 ¥' + (r.balance != null ? r.balance : '?') + '。请先在右上角充值，再来下载。', { title: '余额不足' });
-        } else {
-          if (btn) { btn.disabled = false; btn.textContent = '购买并下载'; }
-          MG.alert((r && r.err) || '购买失败，请稍后再试。', { title: '购买失败' });
-        }
-      }).catch(function (e) {
-        if (btn) { btn.disabled = false; btn.textContent = '购买并下载'; }
-        MG.alert((e && e.err) || '网络异常，购买未完成（未扣费）。', { title: '购买失败' });
-      });
-    });
-  }
 
   /* 审计条目本地化：title/detail 是运行时拼接的（含人名/集数/镜数），字典精确匹配管不到，
    * 这里按模式翻成英文；中文态原样返回。 */
@@ -6014,6 +5872,7 @@
     var shotsToolbar = '<div class="shot-toolbar">' + viewToggle +
       '<button class="primary-btn" id="btnGenShots">生成分镜' + _mjChargeSuffix('gen_shots', 0) + '</button>' +
       shotDurSel +
+      '<button class="ghost-btn" id="btnContinuity">' + (en ? 'Continuity check' : '连续性检查') + '</button>' +
       '<button class="ghost-btn" id="btnAddShot">+ 添加镜头</button>' +
       (isCanvas ? '' : '<button class="ghost-btn" id="btnToggleAll">全部收起</button>') +
       '<span class="mode-note" id="shotMode">' + shotModeText(ep) + '</span>' +
@@ -6127,6 +5986,34 @@
       '</select></div>';
   }
 
+  // 分镜连续性检查：把当前项目交给内置 ShotLock 引擎跑 15 条规则。
+  // 本地纯规则计算，不调模型、不花额度。
+  function runContinuityCheck(p, btn) {
+    var en = (window.SW_I18N && SW_I18N.getLang() === 'en');
+    var lang = en ? 'en' : 'zh';
+    var oldTxt = btn ? btn.textContent : '';
+    if (btn) { btn.disabled = true; btn.textContent = en ? 'Checking…' : '检查中…'; }
+    return MG.api('/api/continuity_check', 'POST', { project: p, lang: lang })
+      .then(function (r) {
+        if (!r || !r.ok) {
+          MG.alert((en ? 'Continuity check failed: ' : '连续性检查失败：')
+            + ((r && (r.error || r.err)) || (en ? 'unknown error' : '未知错误')));
+          return;
+        }
+        MG.modal({
+          title: en ? 'Continuity check · ShotLock' : '连续性检查 · ShotLock',
+          html: r.html || ''
+        });
+      })
+      .catch(function (e) {
+        MG.alert((en ? 'Continuity check failed: ' : '连续性检查失败：')
+          + ((e && e.message) ? e.message : e));
+      })
+      .then(function () {
+        if (btn) { btn.disabled = false; btn.textContent = oldTxt; }
+      });
+  }
+
   function wireEpisode(p, view) {
     if (!window.__storywrightShotFixBound) {
       document.addEventListener('click', function (e) {
@@ -6166,6 +6053,9 @@
 
     var gen = document.getElementById('btnGenShots');
     if (gen) gen.onclick = function () { runGenShots(p, gen); };
+    // 连续性检查（内置 ShotLock 引擎，纯本地规则计算）
+    var cont = document.getElementById('btnContinuity');
+    if (cont) cont.onclick = function () { runContinuityCheck(p, cont); };
     // 镜头时长档切换：写 p.shotDur → 重算本集镜头预算 → 重渲染（下重生成分镜即按新档位）
     var sdSeg = document.getElementById('shotDurSeg');
     if (sdSeg) Array.prototype.forEach.call(sdSeg.querySelectorAll('.sd-opt'), function (el) {
@@ -8149,7 +8039,6 @@
     if (sel.t === 'epmap') return 'epmap';
     if (sel.t === 'world') return 'world';
     if (sel.t === 'style') return 'style';
-    if (sel.t === 'delivery') return 'delivery';
     if (sel.t === 'sec') return 'sec:' + sel.sec;
     if (sel.t === 'item') return 'item:' + sel.sec + ':' + sel.i;
     return '';
@@ -8210,7 +8099,6 @@
     if (sel.t === 'epmap') return episodeMapView(p);
     if (sel.t === 'world') return renderWorldLayer(p);
     if (sel.t === 'style') return renderStyleCard(p);
-    if (sel.t === 'delivery') return renderDeliveryCenter(p);
     if (sel.t === 'sec') {
       var sec = sel.sec;
       if (sec === 'outline') return renderOutlineBlock(p);
@@ -9138,7 +9026,6 @@
         else if (key === 'epmap') p._centralSel = { t: 'epmap' };
         else if (key === 'world') p._centralSel = { t: 'world' };
         else if (key === 'style') p._centralSel = { t: 'style' };
-        else if (key === 'delivery') p._centralSel = { t: 'delivery' };
         save(); renderStep(p);
       };
     });
@@ -9156,8 +9043,6 @@
         it.style.display = (!q || txt.indexOf(q) >= 0) ? '' : 'none';
       });
     });
-    // 交付中心：右详情为交付中心时挂载异步卡片（余额 / 已购态走 /api/wbdl/state）
-    if ((p._centralSel || {}).t === 'delivery') wireDelivery(p);
   }
 
   function fullScriptText(p) {
