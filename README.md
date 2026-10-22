@@ -12,7 +12,7 @@ A five-stage pipeline. Every stage's output is editable and reversible:
 2. **Story Core** — reads the whole text and distills character cards, scene cards, and a relationship web, the anchor for everything that follows.
 3. **Episode Outline** — splits episodes off the core and locks down what each episode is about and where the hook lands.
 4. **Adapted Screenplay** — rewrites episode by episode; characters and scenes are forced to reference the core entities, never invented on the spot.
-5. **Shot Script** — every shot carries shot size, duration, characters, dialogue, screen-left/right position, and production-ready image prompts.
+5. **Shot Script** — every shot carries shot size, duration, characters, dialogue, screen-left/right position, and production-ready image prompts. A built-in **continuity check** runs the 15 ShotLock rules over the finished shot list and reports axis crossings, speech-rate overloads, appearance drift, and scene-lighting conflicts, down to the shot.
 
 Finished screenplays and shot lists are stored locally under `data/projects/*.json` and exported as an asset-pack Markdown you can take to Jimeng, Kling, Midjourney for images, and to your dubbing/subtitle pipeline by the table.
 
@@ -51,8 +51,8 @@ On Windows PowerShell use `$env:STORYWRIGHT_API_KEY="sk-xxxx"` instead of `expor
 Three names, one line, each owning a segment:
 
 - **Storywright (this repo)** — the local open-source edition. Bring your own key, data never leaves the machine.
-- **ShotLock** — the shot-script continuity checker. 15 rules covering axis crossing, speech-rate overload, and character drift. MIT, at `github.com/nianjiang888/shotlock`.
-- **Mojinge (墨金格)** — the cloud-hosted edition at mojinge.cloud. No key to configure, no environment to install, ships a template library and viral-template skills, pay-per-use with failed-generation refunds and a free quota. For people who do not want to tinker.
+- **ShotLock** — the shot-script continuity checker. 15 rules covering axis crossing, speech-rate overload, and character drift. MIT, at `github.com/nianjiang888/shotlock`. Its engine is **bundled in this repo** under `shotlock/`, so the continuity check runs offline with no extra install.
+- **Mojinge (墨金格)** — the cloud-hosted edition, run by the same team. No key to configure, no environment to install, ships a template library and viral-template skills, pay-per-use with failed-generation refunds and a free quota. For people who do not want to tinker.
 
 The local and cloud editions run the same pipeline; the only difference is "build it yourself" versus "someone serves it to you."
 
@@ -65,6 +65,9 @@ workbench.html     The single-file workbench UI (all six steps + story core)
 index.html         Bilingual landing / splash page
 i18n.js            Translation dictionary and runtime (English / 中文)
 common.js          Shared frontend helpers (API client, language toggle, modals)
+continuity.py      Maps a project onto the ShotLock spec and calls the engine
+continuity_report.py  Bilingual report layer (framework + per-issue wording)
+shotlock/          Bundled ShotLock engine (MIT) — the 15 consistency rules
 .env.example       Template for the LLM key / endpoint / model env vars
 requirements.txt   Flask only
 data/              Local project storage (created at runtime; not committed)
@@ -77,6 +80,6 @@ MIT. Use it, modify it, credit or not — your call.
 ## Roadmap
 
 - [x] English README and docs
-- [ ] Built-in ShotLock QC step (run the 15 rules automatically after stage 5)
+- [x] Built-in ShotLock QC step (run the 15 rules automatically after stage 5)
 - [ ] MCP server: let Claude Code / Cursor call the "story core" and "shot script" tools directly
 - [ ] Front-end modularization (split the single-file workbench)
