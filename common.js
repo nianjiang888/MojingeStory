@@ -1448,6 +1448,7 @@
     '.mg-modal-mask{position:fixed;inset:0;background:rgba(4,7,14,0.72);display:none;align-items:center;justify-content:center;z-index:2147483646;padding:20px;}'
     + '.mg-modal-mask.show{display:flex;}'
     + '.mg-modal{width:min(440px,92vw);background:#16181D;border:1px solid #24272E;border-radius:16px;padding:22px 22px 18px;box-shadow:0 18px 60px rgba(0,0,0,0.55);animation:mgmIn .16s ease-out;}'
+    + '.mg-modal.wide{width:min(920px,94vw);}'
     + '@keyframes mgmIn{from{opacity:0;transform:translateY(8px) scale(.98);}to{opacity:1;transform:none;}}'
     + '.mg-modal-title{font-size:16px;font-weight:500;color:#F4F5F7;margin-bottom:10px;letter-spacing:.01em;}'
     + '.mg-modal-body{font-size:13.5px;color:#A6ACB8;line-height:1.65;white-space:pre-wrap;word-break:break-word;max-height:60vh;overflow:auto;}'
@@ -1490,8 +1491,20 @@
       var inputEl = mask.querySelector('.mg-modal-input');
       var okEl = mask.querySelector('.mg-modal-ok');
       var cancelEl = mask.querySelector('.mg-modal-cancel');
+      var modalEl = mask.querySelector('.mg-modal');
       titleEl.textContent = opts.title || '提示';
-      bodyEl.textContent = opts.body || '';
+      // html 模式：直接塞一段自包含 HTML（报告类内容）；普通模式仍是纯文本。
+      if (opts.html) {
+        bodyEl.innerHTML = opts.html;
+        bodyEl.style.whiteSpace = 'normal';
+        bodyEl.style.padding = '0';
+        if (modalEl) modalEl.classList.add('wide');
+      } else {
+        bodyEl.textContent = opts.body || '';
+        bodyEl.style.whiteSpace = '';
+        bodyEl.style.padding = '';
+        if (modalEl) modalEl.classList.remove('wide');
+      }
       if (opts.prompt) {
         inputEl.style.display = '';
         inputEl.value = (opts.input != null) ? opts.input : '';
