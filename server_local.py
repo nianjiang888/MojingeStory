@@ -261,6 +261,41 @@ def api_charge_local():
     return json_resp({"ok": True, "cost": 0, "free": True, "needRecharge": False})
 
 
+# ---------------------------------------------------------------- 分镜连续性检查（内置 ShotLock）
+
+@app.route("/api/continuity_check", methods=["POST"])
+def api_continuity_check():
+    """把当前项目交给内置 ShotLock 引擎跑分镜连续性 15 条规则。
+
+    请求体：{"project": <完整项目 dict>, "lang": "zh"|"en"}
+    返回：双语报告 dict（verdict / counts / issues / data_gaps / html）。
+    lang 决定报告语言——英文界面不能拿到中文报告。
+    """
+    try:
+        raw = request.get_data()
+        if request.headers.get("Content-Encoding") == "gzip":
+            raw = gzip.decompress(raw)
+        body = json.loads(raw.decode("utf-8"))
+    except Exception as e:
+        return json_resp({"ok": False, "error": "请求体解析失败: %s" % e})
+
+    project = body.get("project") or {}
+    if not (project.get("episodes") or project.get("shots")):
+        return json_resp({"ok": False, "error": "项目还没有分镜（步骤⑤未跑），无可校验内容。"})
+
+    lang = str(body.get("lang") or "zh").lower()
+    if lang not in ("zh", "en"):
+        lang = "zh"
+
+    try:
+        from continuity_report import build_report, render_html
+        rpt = build_report(project, lang=lang)
+        rpt["html"] = render_html(rpt)
+        return json_resp(rpt)
+    except Exception as e:
+        return json_resp({"ok": False, "error": "连续性检查失败: %s" % e})
+
+
 if __name__ == "__main__":
     port = int(env("PORT", "5178"))
     print("=" * 56)
