@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""同进程起 Flask 线程 + 截 Storywright 界面图；并抓控制台报错、确认界面已无墨金格残留字样、验证「设置」面板与去计费、验证「关于」弹窗。"""
+"""同进程起 Flask 线程 + 截 MojingeStory 界面图；并抓控制台报错、确认界面已无墨金格残留字样、验证「设置」面板与去计费、验证「关于」弹窗。"""
 import os
 import sys
 import time
@@ -65,7 +65,7 @@ with sync_playwright() as p:
     time.sleep(0.4)
     pg.screenshot(path=out_menu)
     menu_txt = pg.evaluate("document.querySelector('.mg-umenu') ? document.querySelector('.mg-umenu').innerText : ''")
-    for present in ["设置 · API Key", "关于 Storywright"]:
+    for present in ["设置 · API Key", "关于 MojingeStory"]:
         print("菜单含[%s]: %s" % (present, "命中" if present in menu_txt else "缺失!"))
     for absent in ["个人中心", "消费账单", "充值", "退出登录", "UID"]:
         print("菜单无[%s]: %s" % (absent, "OK(无)" if absent not in menu_txt else "残留!"))
