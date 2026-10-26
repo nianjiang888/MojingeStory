@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Storywright 本地后端 —— 模型在你自己的 key 后面，数据不出这台机器。
+MojingeStory 本地后端 —— 模型在你自己的 key 后面，数据不出这台机器。
 
 用法：
     # 1. 装依赖（仅 Flask 一个）
@@ -9,11 +9,12 @@ Storywright 本地后端 —— 模型在你自己的 key 后面，数据不出�
 
     # 2. 配上你自己的 LLM key（OpenAI 兼容接口即可）
     #    Linux / macOS:
-    export STORYWRIGHT_API_KEY=sk-xxxx
-    export STORYWRIGHT_BASE_URL=https://api.deepseek.com/v1
-    export STORYWRIGHT_MODEL=deepseek-chat
+    export MOJINGESTORY_API_KEY=sk-xxxx
+    export MOJINGESTORY_BASE_URL=https://api.deepseek.com/v1
+    export MOJINGESTORY_MODEL=deepseek-chat
     #    Windows PowerShell:
-    #    $env:STORYWRIGHT_API_KEY="sk-xxxx"; $env:STORYWRIGHT_BASE_URL="https://api.deepseek.com/v1"; $env:STORYWRIGHT_MODEL="deepseek-chat"
+    #    $env:MOJINGESTORY_API_KEY="sk-xxxx"; $env:MOJINGESTORY_BASE_URL="https://api.deepseek.com/v1"; $env:MOJINGESTORY_MODEL="deepseek-chat"
+    #    旧变量名 STORYWRIGHT_API_KEY / STORYWRIGHT_BASE_URL / STORYWRIGHT_MODEL 仍兼容（代码已做 fallback）。
 
     # 3. 启动，浏览器打开 http://127.0.0.1:5178
     python3 server_local.py
@@ -80,6 +81,34 @@ def i18n_js():
         return Response(f.read(), mimetype="application/javascript; charset=utf-8")
 
 
+# 前端模块化后，workbench.html 会从 js/ 与 css/ 目录引用拆出来的模块。
+# 只放行这两个目录下的脚本/样式，路径穿越一律拒绝。
+_ASSET_EXT = {".js": "application/javascript; charset=utf-8",
+               ".css": "text/css; charset=utf-8"}
+
+
+def _asset(folder, fn, fallback_mime):
+    if not fn or ".." in fn.replace("\\", "/").split("/"):
+        return Response("forbidden", status=403)
+    ext = os.path.splitext(fn)[1].lower()
+    mime = _ASSET_EXT.get(ext, fallback_mime)
+    path = os.path.join(BASE_DIR, folder, fn.replace("\\", "/"))
+    if not os.path.isfile(path):
+        return Response("not found", status=404)
+    with open(path, encoding="utf-8") as f:
+        return Response(f.read(), mimetype=mime)
+
+
+@app.route("/js/<path:fn>")
+def js_asset(fn):
+    return _asset("js", fn, "application/javascript; charset=utf-8")
+
+
+@app.route("/css/<path:fn>")
+def css_asset(fn):
+    return _asset("css", fn, "text/css; charset=utf-8")
+
+
 @app.route("/api/me")
 def api_me():
     return json_resp({"ok": True, "email": "local@storywright",
@@ -114,15 +143,15 @@ def api_llm():
         return json_resp({"ok": False, "error": "messages 不能为空"})
 
     # 优先用请求体里带的（用户在「设置」面板填的），否则回落环境变量
-    key = body.get("api_key") or env("STORYWRIGHT_API_KEY") or env("OPENAI_API_KEY")
+    key = body.get("api_key") or env("MOJINGESTORY_API_KEY") or env("STORYWRIGHT_API_KEY") or env("OPENAI_API_KEY")
     if not key:
         return json_resp({"ok": False, "noKey": True, "error":
                           "未配置 LLM key。请在界面右上角头像 → 设置 里填写你的 API Key"
-                          "（也可设置环境变量 STORYWRIGHT_API_KEY 后重启服务）。"})
+                          "（也可设置环境变量 MOJINGESTORY_API_KEY 后重启服务，旧名 STORYWRIGHT_API_KEY 仍兼容）。"})
 
-    base = (body.get("base_url") or env("STORYWRIGHT_BASE_URL") or env("OPENAI_BASE_URL")
+    base = (body.get("base_url") or env("MOJINGESTORY_BASE_URL") or env("STORYWRIGHT_BASE_URL") or env("OPENAI_BASE_URL")
             or "https://api.deepseek.com/v1").rstrip("/")
-    model = body.get("model") or env("STORYWRIGHT_MODEL") or env("OPENAI_MODEL") or "deepseek-chat"
+    model = body.get("model") or env("MOJINGESTORY_MODEL") or env("STORYWRIGHT_MODEL") or env("OPENAI_MODEL") or "deepseek-chat"
 
     payload = {
         "model": model,
@@ -147,7 +176,7 @@ def api_llm():
     except urllib.error.HTTPError as e:
         detail = e.read().decode("utf-8", "ignore")[:400]
         if e.code in (401, 403):
-            msg = "LLM key 无效或无权访问（%d）。请检查 STORYWRIGHT_API_KEY。" % e.code
+            msg = "LLM key 无效或无权访问（%d）。请检查 MOJINGESTORY_API_KEY（旧名 STORYWRIGHT_API_KEY 亦兼容）。" % e.code
         elif e.code == 429:
             msg = "触发限流（429）。稍候重试，或换一个 key / 降并发。"
         else:
@@ -299,9 +328,9 @@ def api_continuity_check():
 if __name__ == "__main__":
     port = int(env("PORT", "5178"))
     print("=" * 56)
-    print("  Storywright 本地版  →  http://127.0.0.1:%d" % port)
+    print("  MojingeStory 本地版  →  http://127.0.0.1:%d" % port)
     print("  数据目录: %s" % DATA_DIR)
-    if not (env("STORYWRIGHT_API_KEY") or env("OPENAI_API_KEY")):
-        print("  [警告] 未配置 STORYWRIGHT_API_KEY，生成功能不可用")
+    if not (env("MOJINGESTORY_API_KEY") or env("STORYWRIGHT_API_KEY") or env("OPENAI_API_KEY")):
+        print("  [警告] 未配置 MOJINGESTORY_API_KEY（旧名 STORYWRIGHT_API_KEY 亦兼容），生成功能不可用")
     print("=" * 56)
     app.run(host="0.0.0.0", port=port, debug=False)
