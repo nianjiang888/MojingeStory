@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""mcp_server.py — Storywright 的 MCP server（stdio 传输）。
+"""mcp_server.py — MojingeStory 的 MCP server（stdio 传输）。
 
 让 Claude Code / Cursor / 任何 MCP 客户端直接读写本地项目、跑一致性检查。
 
@@ -35,7 +35,7 @@ import time
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data", "projects")
 
-SERVER_NAME = "storywright"
+SERVER_NAME = "mojingestory"
 SERVER_VERSION = "0.1.0"
 PROTOCOL_VERSIONS = ("2025-06-18", "2025-03-26", "2024-11-05")
 
@@ -213,7 +213,7 @@ def _t_create_project(args: dict) -> str:
     }
     _save_project(proj)
     return ("Created project '%s' (%d characters of source text). Open it in the "
-            "Storywright workbench to build the story core, episodes and shots."
+            "MojingeStory workbench to build the story core, episodes and shots."
             % (name, proj["script"]["charCount"]))
 
 
@@ -274,7 +274,7 @@ def _t_run_continuity_check(args: dict) -> str:
 TOOLS = [
     {
         "name": "list_projects",
-        "description": "List every local Storywright project with episode/shot counts.",
+        "description": "List every local MojingeStory project with episode/shot counts.",
         "inputSchema": {"type": "object", "properties": {}, "required": []},
         "_fn": _t_list_projects,
     },
@@ -296,7 +296,7 @@ TOOLS = [
     {
         "name": "create_project",
         "description": ("Create a project from a source passage so it can be opened in the "
-                        "Storywright workbench."),
+                        "MojingeStory workbench."),
         "inputSchema": {
             "type": "object",
             "properties": {
