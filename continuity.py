@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""continuity.py — Storywright 内置的 ShotLock 分镜连续性检查桥接。
+"""continuity.py — MojingeStory 内置的 ShotLock 分镜连续性检查桥接。
 
-把 Storywright 当前项目（与墨金格同构：bible / episodes / shots）映射成
+把 MojingeStory 当前项目（与墨金格同构：bible / episodes / shots）映射成
 ShotSpec v0.1，交给嵌入的 shotlock 引擎跑 15 条规则，返回报告。
 
 ShotLock 引擎源码来自同仓 ./shotlock/（MIT），此处只做数据映射与调用，
@@ -252,7 +252,7 @@ def _split_dialogue(raw: str, chars: list[str], char_ids: dict) -> list[dict]:
 
 
 def project_to_script(p: dict) -> dict:
-    """Storywright / 墨金格项目 dict -> ShotSpec Script dict。"""
+    """MojingeStory / 墨金格项目 dict -> ShotSpec Script dict。"""
     bible = p.get("bible") or {}
     episodes = p.get("episodes") or []
     shots_by_ep = p.get("shots") or {}
