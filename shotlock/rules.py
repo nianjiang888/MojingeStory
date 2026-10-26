@@ -88,7 +88,7 @@ def visible_len(text: str) -> int:
 
 # 外貌属性维度：同一维度出现互斥取值即为漂移。
 # 这是 AI 生成长剧本时最常见的崩法——第二十场角色发色突然变了。
-# 关键词同时收中英文：英文剧本（Storywright 英文界面）也要能判外貌漂移，
+# 关键词同时收中英文：英文剧本（MojingeStory 英文界面）也要能判外貌漂移，
 # 否则这条规则在英文项目里会静默失效。
 APPEARANCE_DIMENSIONS: dict[str, dict[str, tuple[str, ...]]] = {
     "发长": {
