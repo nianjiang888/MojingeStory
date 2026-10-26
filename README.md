@@ -1,8 +1,10 @@
-# Storywright
+# MojingeStory · 墨金格开源剧本台
 
 A local, precision scriptwriting workbench that weaves novels into short-form dramas. Import the source text, run it through five craft stages — story core, episode outline, adapted screenplay, shot script — and edit at every step. This is not a one-click toy; it is a workbench where you stay in control.
 
 Your novels and scripts never leave your machine. The AI runs behind your own API key.
+
+> 中文名：**墨金格开源剧本台**。本仓库是「墨金格」母品牌旗下的开源剧本工作台，与其云端版「墨金格剧本大师」同源，区别只是「自己搭」还是「有人伺候」。
 
 ## What it does
 
@@ -27,15 +29,17 @@ Requires Python 3.10+ and 4 GB RAM. **No GPU needed** — the AI does not run on
 pip install -r requirements.txt
 
 # 2. Point it at your own LLM key (any OpenAI-compatible endpoint)
-export STORYWRIGHT_API_KEY=sk-xxxx
-export STORYWRIGHT_BASE_URL=https://api.deepseek.com/v1   # optional, defaults to OpenAI
-export STORYWRIGHT_MODEL=deepseek-chat                    # optional
+export MOJINGESTORY_API_KEY=sk-xxxx
+export MOJINGESTORY_BASE_URL=https://api.deepseek.com/v1   # optional, defaults to OpenAI
+export MOJINGESTORY_MODEL=deepseek-chat                    # optional
 
 # 3. Launch, then open http://127.0.0.1:5178 in your browser
 python3 server_local.py
 ```
 
-On Windows PowerShell use `$env:STORYWRIGHT_API_KEY="sk-xxxx"` instead of `export`. DeepSeek, Zhipu GLM, and Qwen all expose OpenAI-compatible endpoints — swap `STORYWRIGHT_BASE_URL` and pay the model vendor directly for tokens.
+On Windows PowerShell use `$env:MOJINGESTORY_API_KEY="sk-xxxx"` instead of `export`. DeepSeek, Zhipu GLM, and Qwen all expose OpenAI-compatible endpoints — swap `MOJINGESTORY_BASE_URL` and pay the model vendor directly for tokens.
+
+> 兼容说明：旧环境变量名 `STORYWRIGHT_API_KEY` / `STORYWRIGHT_BASE_URL` / `STORYWRIGHT_MODEL` 仍可识别（代码做了 fallback），但新装请使用 `MOJINGESTORY_*`。
 
 ## Manage your expectations (read this before installing)
 
@@ -46,13 +50,13 @@ On Windows PowerShell use `$env:STORYWRIGHT_API_KEY="sk-xxxx"` instead of `expor
 5. **Issue response is not guaranteed.** This is an open-source release of a tool we run in production, not a commercial product.
 6. **The front end is a single ~620k-character file.** It looks acceptable; we have not split it yet. Use first, split later.
 
-## Relationship with Mojinge and ShotLock
+## Relationship with 墨金格剧本大师 and ShotLock
 
 Three names, one line, each owning a segment:
 
-- **Storywright (this repo)** — the local open-source edition. Bring your own key, data never leaves the machine.
+- **MojingeStory (this repo, 墨金格开源剧本台)** — the local open-source edition. Bring your own key, data never leaves the machine.
 - **ShotLock** — the shot-script continuity checker. 15 rules covering axis crossing, speech-rate overload, and character drift. MIT, at `github.com/nianjiang888/shotlock`. Its engine is **bundled in this repo** under `shotlock/`, so the continuity check runs offline with no extra install.
-- **Mojinge (墨金格)** — the cloud-hosted edition, run by the same team. No key to configure, no environment to install, ships a template library and viral-template skills, pay-per-use with failed-generation refunds and a free quota. For people who do not want to tinker.
+- **墨金格剧本大师 (MojingeStory Cloud)** — the cloud-hosted edition, run by the same team. No key to configure, no environment to install, ships a template library and viral-template skills, pay-per-use with failed-generation refunds and a free quota. For people who do not want to tinker.
 
 The local and cloud editions run the same pipeline; the only difference is "build it yourself" versus "someone serves it to you."
 
@@ -70,13 +74,15 @@ Client config (Claude Desktop / Cursor, adjust the paths):
 ```json
 {
   "mcpServers": {
-    "storywright": {
+    "mojingestory": {
       "command": "python3",
-      "args": ["/absolute/path/to/storywright/mcp_server.py"]
+      "args": ["/absolute/path/to/MojingeStory/mcp_server.py"]
     }
   }
 }
 ```
+
+> 注：MCP server 内部标识（server name、localStorage 键、全局变量）沿用小写 `storywright` 作为工程标识，不破坏你已有的本地数据与 MCP 客户端配置；对外产品名统一为 MojingeStory。
 
 Tools it exposes:
 
@@ -112,7 +118,7 @@ MIT. Use it, modify it, credit or not — your call.
 
 ## Roadmap
 
-- [x] English README and docs
+- [x] English + 中文 README and docs
 - [x] Built-in ShotLock QC step (run the 15 rules automatically after stage 5)
 - [x] MCP server: let Claude Code / Cursor call the "story core" and "shot script" tools directly
 - [ ] Front-end modularization (split the single-file workbench)
