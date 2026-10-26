@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Storywright 本地后端进程内自测（不经网络，用 Flask test_client）。"""
+"""MojingeStory 本地后端进程内自测（不经网络，用 Flask test_client）。"""
 import gzip
 import json
 import os
@@ -24,9 +24,9 @@ def check(name, cond, detail=""):
 
 # 静态
 r = client.get("/")
-check("GET / 返回 HTML", r.status_code == 200 and "Storywright" in r.get_data(as_text=True))
+check("GET / 返回 HTML", r.status_code == 200 and "MojingeStory" in r.get_data(as_text=True))
 r = client.get("/common.js")
-check("GET /common.js", r.status_code == 200 and "Storywright" in r.get_data(as_text=True))
+check("GET /common.js", r.status_code == 200 and "MojingeStory" in r.get_data(as_text=True))
 
 # 状态类
 r = client.get("/api/ping")
