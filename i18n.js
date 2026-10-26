@@ -1,4 +1,4 @@
-/* Storywright i18n — 中 / 英 双语（运行时翻译引擎）
+/* MojingeStory i18n — 中 / 英 双语（运行时翻译引擎）
  * 设计：不侵入 render 代码。DOM 文本节点 + placeholder/title 属性按「中文原文 → 英文」字典匹配翻译，
  * MutationObserver 监听动态渲染，新增节点自动翻译。字典未命中的字符串保持原样（LLM 提示词、
  * 示例剧本等内容因此天然不会被误翻——它们只在 JS 变量里，不进 DOM）。
@@ -11,7 +11,7 @@
   var DICT = {
     /* —— 顶栏 / 侧栏 / 步骤 —— */
     '剧本工作台': 'Workbench',
-    'Storywright · 剧本工作台': 'Storywright · Screenwriting Workbench',
+    'MojingeStory · 剧本工作台': 'MojingeStory · Screenwriting Workbench',
     '本': 'L',
     '主线流程 · 第 1 / 6 步': 'Workflow · Step 1 / 6',
     '主线流程 · 第 2 / 6 步': 'Workflow · Step 2 / 6',
@@ -21,7 +21,7 @@
     '主线流程 · 第 6 / 6 步': 'Workflow · Step 6 / 6',
     '创作范式 / 模版 ▾': 'Paradigms / Templates ▾',
     '创作范式 / 模版': 'Paradigms / Templates',
-    'Storywright · 专注剧本创作': 'Storywright · Screenwriting Workbench',
+    'MojingeStory · 专注剧本创作': 'MojingeStory · Screenwriting Workbench',
     '专注剧本创作': 'Screenwriting Workbench',
     '主线流程': 'Workflow',
     '质量保障': 'Quality Guard',
@@ -72,7 +72,7 @@
 
     /* —— 用户菜单 / 设置 / 关于 —— */
     '设置 · API Key': 'Settings · API Key',
-    '关于 Storywright': 'About Storywright',
+    '关于 MojingeStory': 'About MojingeStory',
     '把你的模型 Key 填在这里，只存在你这台浏览器里，调用时只发往对应服务商，我们收不到。': 'Your model key is stored in this browser only, and requests go straight to your provider. We never see it.',
     '用 DeepSeek（最常用）的话，只填 Key 就够了，下面两项留空。': 'With DeepSeek (most common), just fill in the Key and leave the two fields below empty.',
     'API Key': 'API Key',
@@ -109,7 +109,7 @@
     '生成完成后，在第 6 步「导出资产包」一键带走全部剧本与提示词（.md 文件）。': 'When done, export everything as a single .md from the Export Asset Pack button.',
 
     /* —— 更新日志弹窗 —— */
-    'Storywright 0.1.0 · 首个开源版本': 'Storywright 0.1.0 · First open-source release',
+    'MojingeStory 0.1.0 · 首个开源版本': 'MojingeStory 0.1.0 · First open-source release',
     '本地开源版首发：导入小说 → 故事中枢 → 分集大纲 → 改编剧本 → 分镜脚本 → 导出资产包，全流程在本机完成': 'First local open-source release: import → story bible → episode outline → adapted script → storyboard → export, all on your machine',
     '模型跑在你自己的 key 后面（OpenAI 兼容接口均可，如 DeepSeek / 智谱 / 通义），数据不出这台机器': 'Models run behind your own key (any OpenAI-compatible API, e.g. DeepSeek / Zhipu / Qwen); data never leaves this machine',
     '无需注册登录；项目保存在本机 data/projects 目录，导出为 .md 直接拿去即梦 / 可灵 / Midjourney 等平台出图出视频': 'No signup or login; projects save to local data/projects; export .md straight to Jimeng / Kling / Midjourney and other tools',
@@ -551,7 +551,7 @@
     '导出资产包': 'Export Asset Pack',
     '已购买「': 'Purchased "',
     '下载「': 'Download "',
-    '由 Storywright 导出的全剧内容资产包：故事总纲 + 改编蓝图 + 全局风格卡 + 人物 DNA 档案（16 字段 + 生图提示词）+ 场景三段描写 + 每集剧本与分镜提示词 + 配音稿 / 字幕表 / 音效谱。拿去即梦 / 可灵 / Midjourney 等任意平台出图出视频，配音与字幕直接照表开工。': 'Full asset pack exported by Storywright: story outline + adaptation blueprint + style card + character DNA profiles (16 fields + image prompts) + scene descriptions + per-episode scripts and shot prompts + voice-over / subtitle / SFX sheets. Take it to Jimeng / Kling / Midjourney for image and video; voice and subs follow the sheets directly.',
+    '由 MojingeStory 导出的全剧内容资产包：故事总纲 + 改编蓝图 + 全局风格卡 + 人物 DNA 档案（16 字段 + 生图提示词）+ 场景三段描写 + 每集剧本与分镜提示词 + 配音稿 / 字幕表 / 音效谱。拿去即梦 / 可灵 / Midjourney 等任意平台出图出视频，配音与字幕直接照表开工。': 'Full asset pack exported by MojingeStory: story outline + adaptation blueprint + style card + character DNA profiles (16 fields + image prompts) + scene descriptions + per-episode scripts and shot prompts + voice-over / subtitle / SFX sheets. Take it to Jimeng / Kling / Midjourney for image and video; voice and subs follow the sheets directly.',
     '## 人物 DNA 档案': '## Character DNA Profiles',
     '## 场景资产（三段描写 + 堪景单）': '## Scene Assets (3-tier description + scout sheet)',
     '## 故事总纲': '## Story Outline',
@@ -851,7 +851,7 @@
     '当前项目还没有分集。': 'No episodes yet.',
     '导出全剧内容资产包 →': 'Export full asset pack →',
     '本地版是纯剧本工作台——出图、配音、成片请拿导出的提示词去你自己的即梦 / 可灵 / Midjourney 等工具完成。点右侧按钮一键导出全剧内容资产包（.md），带走即开工。': 'The local build is a pure screenwriting workbench — for images, voice and final cuts, take the exported prompts to your own Dreamina / Kling / Midjourney. Hit the button to export the full asset pack (.md) and get to work.',
-    '由 Storywright 导出的全剧内容资产包': 'Full-series asset pack exported from Storywright',
+    '由 MojingeStory 导出的全剧内容资产包': 'Full-series asset pack exported from MojingeStory',
     '交付三件套': 'Deliverables trio',
     '配音稿（全剧·按集）': 'Dub script (full series, by episode)',
     '字幕表（全剧·按集）': 'Subtitle sheet (full series, by episode)',
@@ -1354,7 +1354,7 @@
 
   /* ===== 文档标题翻译（<title> 在 head，walk(body) 覆盖不到）===== */
   var TITLE_DICT = {
-    'Storywright 故事匠 · 剧本工作台': 'Storywright · Screenwriting Workbench'
+    'MojingeStory 故事匠 · 剧本工作台': 'MojingeStory · Screenwriting Workbench'
   };
   var _titleOrig = null;   // 首次进入时的原始标题（中文），用于切回中文时还原
   function translateTitle() {
