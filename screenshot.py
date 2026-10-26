@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""启动后等服务器就绪，用 chromium 截一张 Storywright 界面图。"""
+"""启动后等服务器就绪，用 chromium 截一张 MojingeStory 界面图。"""
 import os
 import sys
 import time
