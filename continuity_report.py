@@ -5,7 +5,7 @@
 ShotLock 引擎（./shotlock/）是「单一事实源」：规则怎么判、判出什么，
 一律由引擎决定，本模块不重写任何判定逻辑。
 
-但引擎的规则文案是中文写死的，Storywright 的英文界面不能直接把中文报告
+但引擎的规则文案是中文写死的，MojingeStory 的英文界面不能直接把中文报告
 甩给用户。所以本模块做两件事：
 
 1. 框架层双语：级别标签、规则名、结论（verdict）、报告表头 —— 全部按
@@ -324,7 +324,7 @@ def translate_issue(issue: dict, lang: str) -> dict:
     return out
 
 
-# 数据缺口说明：如实告知哪些规则因 Storywright 分镜没有对应字段而未参与，
+# 数据缺口说明：如实告知哪些规则因 MojingeStory 分镜没有对应字段而未参与，
 # 免得用户以为「没报 = 全过」。
 DATA_GAPS = {
     "zh": [
