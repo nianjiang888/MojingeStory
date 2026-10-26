@@ -1,8 +1,8 @@
 /* ============================================================
- * Storywright common.js —— 三页面共用：后端地址 / 统一顶栏 / 登录 / 请求封装
+ * MojingeStory common.js —— 三页面共用：后端地址 / 统一顶栏 / 登录 / 请求封装
  * 全新项目，与旧项目零关系。
- * 统一产品壳：Storywright 故事匠，含 剧本工作台 / 视频工作台 / 素材库 三个功能页
- * 登录统一为「邮箱 + 密码」，Storywright与工作台共用同一账号。
+ * 统一产品壳：MojingeStory 故事匠，含 剧本工作台 / 视频工作台 / 素材库 三个功能页
+ * 登录统一为「邮箱 + 密码」，MojingeStory与工作台共用同一账号。
  * ============================================================ */
 (function () {
   'use strict';
@@ -26,7 +26,7 @@
   var CHANGELOG = [
     {
       v: '0.1.0', date: '2026-10-19',
-      title: 'Storywright 0.1.0 · 首个开源版本',
+      title: 'MojingeStory 0.1.0 · 首个开源版本',
       items: [
         '本地开源版首发：导入小说 → 故事中枢 → 分集大纲 → 改编剧本 → 分镜脚本 → 导出资产包，全流程在本机完成',
         '模型跑在你自己的 key 后面（OpenAI 兼容接口均可，如 DeepSeek / 智谱 / 通义），数据不出这台机器',
@@ -354,8 +354,8 @@
     ov.innerHTML =
       '<div class="mg-modal" style="width:480px;max-width:94%;padding:28px;">' +
       '<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">' +
-      '<div style="width:40px;height:40px;border-radius:10px;background:#F5A623;color:#0A0B0E;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;">S</div>' +
-      '<div><div style="font-size:18px;font-weight:700;color:#E8EDF6;">Storywright</div>' +
+      '<div style="width:40px;height:40px;border-radius:10px;background:#F5A623;color:#0A0B0E;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;">M</div>' +
+      '<div><div style="font-size:18px;font-weight:700;color:#E8EDF6;">MojingeStory</div>' +
       '<div style="font-size:12px;color:#8b98b3;">v' + (typeof APP_VERSION !== 'undefined' ? APP_VERSION : '0.1.0') + ' · build ' + (typeof BUILD !== 'undefined' ? BUILD : '') + ' · MIT ' + (window.SW_I18N && SW_I18N.getLang && SW_I18N.getLang() !== 'zh' ? 'open source' : '开源') + '</div></div>' +
       '</div>' +
       '<div style="font-size:13px;color:#c9d3e3;line-height:1.9;">' +
@@ -404,8 +404,8 @@
       : toggleBtns + '<button class="mg-btn solid" id="mgLogin">开始使用</button>';
     bar.innerHTML =
       '<div style="display:flex;align-items:center;flex:0 0 auto;">' +
-      '<div class="mg-logo" id="mgLogo"><div class="mark">S</div>' +
-      '<div class="name">Storywright · <b>专注剧本创作</b></div></div>' +
+      '<div class="mg-logo" id="mgLogo"><div class="mark">M</div>' +
+      '<div class="name">MojingeStory · <b>专注剧本创作</b></div></div>' +
       '<div class="mg-tabs">' + tabsHtml + '</div>' +
       '</div>' +
       (opts.centerHtml ? '<div class="mg-center">' + opts.centerHtml + '</div>' : '') +
@@ -500,8 +500,8 @@
     ov.innerHTML =
       '<div id="mgLoginCard" class="mg-modal">' +
       '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">' +
-      '<div style="width:28px;height:28px;border-radius:8px;background:#101216;border:1px solid #24272E;display:flex;align-items:center;justify-content:center;font-weight:500;color:#F4F5F7;font-size:14px;">S</div>' +
-      '<span style="font-size:19px;font-weight:500;">开始使用 Storywright</span></div>' +
+      '<div style="width:28px;height:28px;border-radius:8px;background:#101216;border:1px solid #24272E;display:flex;align-items:center;justify-content:center;font-weight:500;color:#F4F5F7;font-size:14px;">M</div>' +
+      '<span style="font-size:19px;font-weight:500;">开始使用 MojingeStory</span></div>' +
       '<p class="sub">邮箱 + 密码（≥6 位），注册即用。快速创作免费体验，爆款模板首单免费；按次付费。</p>' +
       '<input id="mgEmail" placeholder="邮箱（如 you@example.com）" style="width:100%;padding:12px;margin-bottom:12px;background:#101216;border:1px solid #24272E;color:#F4F5F7;border-radius:8px;font-size:14px;box-sizing:border-box;outline:none;">' +
       '<input id="mgPwd" type="password" placeholder="密码" style="width:100%;padding:12px;margin-bottom:6px;background:#101216;border:1px solid #24272E;color:#F4F5F7;border-radius:8px;font-size:14px;box-sizing:border-box;outline:none;">' +
@@ -519,7 +519,7 @@
       '<div id="mgForgot" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;align-items:center;justify-content:center;">' +
         '<div style="background:#16181D;border:1px solid #24272E;border-radius:12px;padding:22px;width:320px;max-width:90vw;text-align:center;">' +
           '<h3 style="margin:0 0 6px;font-size:16px;font-weight:500;color:#F4F5F7;">忘记密码？</h3>' +
-          '<p style="margin:0 0 14px;font-size:13px;color:#A6ACB8;line-height:1.6;">为保障账号安全，Storywright暂不提供自助找回，密码是您身份的唯一凭证。请添加下方企业微信客服，由客服与您沟通处理。</p>' +
+          '<p style="margin:0 0 14px;font-size:13px;color:#A6ACB8;line-height:1.6;">为保障账号安全，MojingeStory暂不提供自助找回，密码是您身份的唯一凭证。请添加下方企业微信客服，由客服与您沟通处理。</p>' +
           '<img src="/static/img/wxkf_qr.png" alt="客服企业微信二维码" style="width:170px;height:170px;object-fit:cover;border-radius:8px;border:1px solid #24272E;cursor:zoom-in;" onclick="MG.showImgLightbox(\'/static/img/wxkf_qr.png\')" title="点击放大">' +
           '<p style="margin:12px 0 16px;font-size:12px;color:#A6ACB8;">长按或截图保存，用微信扫一扫添加客服</p>' +
           '<button id="mgForgotBack" style="width:100%;padding:11px;background:transparent;border:1px solid #24272E;color:#A6ACB8;border-radius:8px;cursor:pointer;font-size:13px;">返回登录</button>' +
@@ -617,8 +617,8 @@
     ov.innerHTML =
       '<div class="mg-modal" style="max-width:420px;width:92%;max-height:84vh;display:flex;flex-direction:column;">' +
       '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex:0 0 auto;">' +
-      '<div style="width:28px;height:28px;border-radius:8px;background:#101216;border:1px solid #24272E;display:flex;align-items:center;justify-content:center;font-weight:500;color:#F4F5F7;font-size:14px;">S</div>' +
-      '<span style="font-size:18px;font-weight:500;">Storywright 近期更新</span></div>' +
+      '<div style="width:28px;height:28px;border-radius:8px;background:#101216;border:1px solid #24272E;display:flex;align-items:center;justify-content:center;font-weight:500;color:#F4F5F7;font-size:14px;">M</div>' +
+      '<span style="font-size:18px;font-weight:500;">MojingeStory 近期更新</span></div>' +
       '<div style="overflow-y:auto;margin:2px 0 14px;flex:1 1 auto;-webkit-overflow-scrolling:touch;">' +
       '<p class="sub" style="margin:0 0 12px;">以下是最近一次更新的内容，点「知道了」即可进入。</p>' + body + '</div>' +
       '<button id="mgUpOk" style="width:100%;padding:13px;flex:0 0 auto;background:#F5A623;border:none;color:#0A0B0E;border-radius:8px;cursor:pointer;font-size:15px;font-weight:500;">知道了，进入</button>' +
@@ -713,7 +713,7 @@
       '<div id="mgRechargeBody">' +
         '<div class="mg-rc-fee">' +
           '<div class="mg-rc-fee-title">充值说明</div>' +
-          '<p>Storywright所有生成任务均调用 可灵、万相、百炼、火山、豆包、DeepSeek 等第三方大模型，你账户里的余额按每次实际调用量实时结算给大模型厂商，Storywright仅按 API 成本计价。充值后实时到账，未消费部分可随时申请退款。</p>' +
+          '<p>MojingeStory所有生成任务均调用 可灵、万相、百炼、火山、豆包、DeepSeek 等第三方大模型，你账户里的余额按每次实际调用量实时结算给大模型厂商，MojingeStory仅按 API 成本计价。充值后实时到账，未消费部分可随时申请退款。</p>' +
         '</div>' +
         '<div class="mg-rc-label">选择充值套餐</div>' +
         '<div class="mg-rc-pkgs">' + pkgs + '</div>' +
@@ -726,10 +726,10 @@
         '</div>' +
         '<button id="mgRPayBtn" class="mg-rc-paybtn">微信扫码充值</button>' +
         '<div class="mg-rc-guard">' +
-          '<div class="mg-rc-qr"><img src="/static/img/wxkf_qr.png" alt="Storywright客服" style="cursor:zoom-in;" onclick="MG.showImgLightbox(\'/static/img/wxkf_qr.png\')" title="点击放大"></div>' +
+          '<div class="mg-rc-qr"><img src="/static/img/wxkf_qr.png" alt="MojingeStory客服" style="cursor:zoom-in;" onclick="MG.showImgLightbox(\'/static/img/wxkf_qr.png\')" title="点击放大"></div>' +
           '<div class="mg-rc-guard-text">' +
             '<b>随时退款 · 人工客服</b>' +
-            '<p>充值后不想用了、算错账、或需要开票，扫码加Storywright客服微信，未消费余额随时全额退款。</p>' +
+            '<p>充值后不想用了、算错账、或需要开票，扫码加MojingeStory客服微信，未消费余额随时全额退款。</p>' +
           '</div>' +
         '</div>' +
       '</div>' +
@@ -888,7 +888,7 @@
       '</div>' +
       '</div>' +
       '<div class="item" id="umuSettings"><svg viewBox="0 0 24 24"><path d="M19.4 13a7.8 7.8 0 000-2l2-1.6-2-3.4-2.4 1a7.6 7.6 0 00-1.7-1l-.4-2.5H10.1l-.4 2.5a7.6 7.6 0 00-1.7 1l-2.4-1-2 3.4L3.6 11a7.8 7.8 0 000 2l-2 1.6 2 3.4 2.4-1a7.6 7.6 0 001.7 1l.4 2.5h3.8l.4-2.5a7.6 7.6 0 001.7-1l2.4 1 2-3.4-2-1.6zM12 15.5a3.5 3.5 0 110-7 3.5 3.5 0 010 7z"/></svg>设置 · API Key</div>' +
-      '<div class="item" id="umuAbout"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>关于 Storywright</div>' +
+      '<div class="item" id="umuAbout"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>关于 MojingeStory</div>' +
       '</div>';
     document.body.appendChild(ov);
     document.addEventListener('keydown', _umenuKey);
@@ -1037,7 +1037,7 @@
     });
   }
 
-  /* ---------- 统一底部状态栏（剧本工作台 / 素材库共用；Storywright编辑器有自己的 .jg-status） ----------
+  /* ---------- 统一底部状态栏（剧本工作台 / 素材库共用；MojingeStory编辑器有自己的 .jg-status） ----------
      items: [{id:'stFoo', label:'当前项目', value:'—'}, ...]
      返回一个 set(id, value) 函数，页面拿去更新数值即可。 */
   var STATUSBAR_CSS = '' +
@@ -1064,7 +1064,7 @@
     bar.innerHTML = (items || []).map(function (it) {
       return '<span>' + it.label + ' <b id="' + it.id + '">' + (it.value === undefined ? '—' : it.value) + '</b></span>';
     }).join('') +
-      '<span class="mg-st-build">Storywright · ' + (pageName || '') + '</span>';
+      '<span class="mg-st-build">MojingeStory · ' + (pageName || '') + '</span>';
     document.body.appendChild(bar);
     document.body.classList.add('mg-has-status');
     return function set(id, value) {
@@ -1430,7 +1430,7 @@
     f.id = 'swSiteFooter';
     f.style.cssText = 'position:fixed;left:0;right:0;bottom:0;height:34px;display:flex;align-items:center;justify-content:center;gap:14px;font-size:12px;color:#6B7280;background:#0A0B0E;border-top:1px solid #24272E;z-index:50;flex-wrap:wrap;padding:0 10px;box-sizing:border-box;';
     f.innerHTML =
-      '<span>© 2026 Storywright Contributors</span>' +
+      '<span>© 2026 MojingeStory Contributors</span>' +
       '<span>v' + APP_VERSION + ' · build ' + BUILD + '</span>';
     document.body.appendChild(f);
     document.body.style.paddingBottom = '34px';
