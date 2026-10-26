@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Storywright 端到端真实 LLM 测试：从 ~/.dsh/.credentials.yaml 读 DeepSeek key，
+"""MojingeStory 端到端真实 LLM 测试：从 ~/.dsh/.credentials.yaml 读 DeepSeek key，
 用工作台里真实的 system prompt 打 /api/llm，验证整条链路。"""
 import os
 import re
